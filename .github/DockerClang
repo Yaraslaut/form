@@ -1,0 +1,25 @@
+FROM ubuntu:latest
+
+WORKDIR /
+RUN apt-get update
+RUN apt-get install -y cmake python3 ninja-build git lsb-release software-properties-common wget binutils gcc g++
+#RUN bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+RUN bash -c "\
+    set -ex && \
+    git clone -b p2996 https://github.com/Yaraslaut/clang-p2996.git && \
+    cmake -S /clang-p2996/llvm \
+        -B build \
+        -G Ninja \
+        #-D CMAKE_CXX_COMPILER=clang++-18 \
+        #-D CMAKE_C_COMPILER=clang-18 \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D CMAKE_INSTALL_PREFIX=\/usr \
+        -D LLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'\
+        -D LLVM_ENABLE_PROJECTS=clang\
+        -D LLVM_TARGETS_TO_BUILD=X86 && \
+    cmake --build build --parallel && \
+    cmake --build build --target install && \
+    echo "/usr/lib/x86_64-unknown-linux-gnu" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf && \
+    ldconfig && \
+    rm -rf /build && \
+    rm -rf /clang-p2996"
