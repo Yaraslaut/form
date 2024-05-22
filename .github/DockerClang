@@ -1,0 +1,34 @@
+# docker buildx build --tag clang-p2996 --progress=plain -f .github/DockerClang --load .
+# docker tag clang-p2996 yaraslaut/clang-p2996
+# docker push yaraslaut/clang-p2996
+FROM ubuntu:latest AS builder
+
+#git clone -b p2996 https://github.com/Yaraslaut/clang-p2996.git && \
+WORKDIR /
+RUN apt-get update
+RUN apt-get install -y cmake python3 ninja-build git lsb-release software-properties-common wget binutils gcc g++
+RUN wget https://apt.llvm.org/llvm.sh
+RUN chmod +x llvm.sh
+RUN ./llvm.sh 20
+RUN git clone -b p2996 https://github.com/bloomberg/clang-p2996.git
+RUN cmake -S /clang-p2996/llvm \
+        -B build \
+        -G Ninja \
+        -D CMAKE_CXX_COMPILER=clang++-20 \
+        -D CMAKE_C_COMPILER=clang-20 \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D LLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'\
+        -D LLVM_ENABLE_PROJECTS=clang\
+        -D LLVM_TARGETS_TO_BUILD=X86
+RUN cmake --build build --parallel
+RUN cmake --install build  --prefix /tmp/clang-install
+
+FROM ubuntu:latest
+# Install packages for minimal useful image.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential  ca-certificates libcurl4-openssl-dev cmake make wget python3 sudo curl ninja-build git binutils && \
+    rm -rf /var/lib/apt/lists/*
+# Copy build results of stage 1 to /usr/local.
+COPY --from=builder /tmp/clang-install/ /usr/local/
+RUN P=`/usr/local/bin/clang++ -v 2>&1 | grep Target | cut -d' ' -f2-`; echo /usr/local/lib/$P > /etc/ld.so.conf.d/$P.conf
+RUN ldconfig
