@@ -91,4 +91,7 @@ consteval auto create_variant(auto reflection) {
                                        members_of(reflection)});
 }
 
+template <typename Check, typename ...T>
+concept is_one_of = std::disjunction_v<std::is_same<Check,T>...>;
+
 } // namespace form::util

@@ -33,11 +33,6 @@ struct AA {
   A b;
 };
 
-template <typename T>
-  requires std::is_same_v<T, Z> || std::is_same_v<T, S> ||
-           std::is_same_v<T, X> || std::is_same_v<T, Y>
-struct std::formatter<T> : form::universal_formatter<T> {};
-
 /// ColumnCount simply represents a number of columns.
 using ColumnCount = boxed::boxed<int>;
 

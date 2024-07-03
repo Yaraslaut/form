@@ -41,7 +41,7 @@ void EnumToString() {
 
 ## Universal formatter
 
-This will create formatter for any type that is not specified by the standard library. 
+
 
 ``` c++
 
@@ -64,7 +64,14 @@ class Z : public X, private Y {
 
 
 template <typename T>
-struct std::formatter<T> : form::universal_formatter<T> {};
+  requires form::util::is_one_of<T, Z>
+struct std::formatter<T> : std::formatter<std::string> {
+  auto format(const T &val, std::format_context &ctx) const {
+    return std::format_to(ctx.out(), "{}",
+                          form::universal_formatter::format(val));
+  }
+};
+
 
 int main() {
   std::println("{}", Z()); // Z{X{.m1=1}, Y{.m2=2}, .m3=3, .m4=4}
@@ -72,7 +79,6 @@ int main() {
 
 
 ```
-
 
 
 ## Serialization into different formats 

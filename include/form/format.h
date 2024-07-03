@@ -36,33 +36,36 @@ void decrease_level() {}
 
 } // namespace json
 
-template <typename T> struct universal_formatter : std::formatter<std::string> {
-  auto format(T const &t, auto &ctx) const {
-    auto out = std::format_to(ctx.out(), "{}{{", name_of<std::string_view>(^T));
+namespace universal_formatter {
 
-    auto delim = [first = true, &out]() mutable {
-      if (!first) {
-        *out++ = ',';
-        *out++ = ' ';
-      }
-      first = false;
-    };
+template <typename T> std::string format(T const &t) {
+  std::string formatted;
+  auto out = std::back_inserter(formatted);
+  std::format_to(out, "{}{{", name_of<std::string_view>(^T));
 
-    [:util::expand(bases_of(^T)):] >> [&]<auto base> {
-      delim();
-      out = std::format_to(out, "{}", (typename[:type_of(base):] const &)(t));
-    };
+  auto delim = [first = true, &out]() mutable {
+    if (!first) {
+      *out++ = ',';
+      *out++ = ' ';
+    }
+    first = false;
+  };
 
-    [:util::expand(nonstatic_data_members_of(^T)):] >> [&]<auto mem> {
-      delim();
-      out = std::format_to(out, ".{}={}", name_of<std::string_view>(mem),
-                           t.[:mem:]);
-    };
+  [:util::expand(bases_of(^T)):] >> [&]<auto base> {
+    delim();
+    std::format_to(out, "{}", format((typename[:type_of(base):] const &)(t)));
+  };
 
-    *out++ = '}';
-    return out;
-  }
-};
+  [:util::expand(nonstatic_data_members_of(^T)):] >> [&]<auto mem> {
+    delim();
+    std::format_to(out, ".{}={}", name_of<std::string_view>(mem), t.[:mem:]);
+  };
+
+  *out++ = '}';
+  return formatted;
+}
+
+}; // namespace universal_formatter
 
 template <auto refl, typename T> std::string format(T const &t) {
   std::string out;
