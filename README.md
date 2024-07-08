@@ -24,6 +24,8 @@ using list_variant = [:form::util::create_variant(^list):];
 
 ## Enum to string 
 
+Transform enum directly to std::string
+
 ``` c++
 
 enum class Color { red, green, blue };
@@ -33,6 +35,27 @@ void EnumToString() {
 }
 
 ```
+
+If you want to apply some pattern to the formatting of enum value name
+
+``` c++
+void EnumToString() { 
+  auto transform = [](std::string data) {
+    std::string out;
+    out += std::tolower(data[0]);
+    for (auto const c : data.substr(1, data.size())) {
+      if (std::isupper(c))
+        out += "-";
+      out += std::tolower(c);
+    }
+    return out;
+  };
+  form::enum_to_string(Decorator::Underline, transform) //  underline
+  form::enum_to_string(Decorator::DottedUnderline, transform) // dotted-underline
+}
+```
+
+`
 
 ## Variant type to string
 

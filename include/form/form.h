@@ -32,6 +32,12 @@ constexpr std::string enum_to_string(E value) {
   return result;
 }
 
+template <typename E>
+  requires std::is_enum_v<E>
+constexpr std::string enum_to_string(E value, auto transformation) {
+  return transformation(enum_to_string(value));
+}
+
 template <typename T> bool compare(T const &lhs, T const &rhs) {
   bool result = true;
   if constexpr (std::is_arithmetic_v<T>)

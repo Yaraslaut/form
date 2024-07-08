@@ -322,6 +322,18 @@ using list_variant = [:form::util::create_variant(^list):];
 
 enum class Color { red, green, blue };
 
+enum class Decorator : uint8_t {
+  Underline,
+  DoubleUnderline,
+  CurlyUnderline,
+  DottedUnderline,
+  DashedUnderline,
+  Overline,
+  CrossedOut,
+  Framed,
+  Encircle,
+};
+
 namespace form::examples {
 bool VariantCreate() {
   list_variant v{list::CancelSelection{}};
@@ -335,6 +347,25 @@ bool VariantToString() {
 }
 
 bool EnumToString() { return form::enum_to_string(Color::red) == "red"; }
+
+bool EnumToStringWithTransform() {
+  bool res = true;
+  auto transform = [](std::string data) {
+    std::string out;
+    out += std::tolower(data[0]);
+    for (auto const c : data.substr(1, data.size())) {
+      if (std::isupper(c))
+        out += "-";
+      out += std::tolower(c);
+    }
+    return out;
+  };
+  res &= (form::enum_to_string(Decorator::Underline, transform) == "underline");
+  res &= (form::enum_to_string(Decorator::DottedUnderline, transform) ==
+          "dotted-underline");
+  return res;
+}
+
 } // namespace form::examples
 
 void ExampleConfig() {
