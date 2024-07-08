@@ -11,10 +11,6 @@ namespace form::util {
 
 consteval auto name_of(auto type) { return name_of<std::string_view>(type); }
 
-template <typename T>
-concept is_trivial_type =
-    std::is_arithmetic<T>::value || std::is_same_v<T, std::string>;
-
 template <typename... Ts, typename F> constexpr void enumerate_types(F &&f) {
   [&f]<auto... Is>(std::index_sequence<Is...>) {
     (f.template operator()<Ts, Is>(), ...);
@@ -53,12 +49,6 @@ template <typename T> consteval auto number_of_base() {
   return bases_of(^T).size();
 }
 
-template <typename T>
-concept has_value_type = requires { typename T::value_type; };
-
-template <typename T>
-concept has_inner_type = requires { typename T::inner_type; };
-
 namespace __impl {
 template <auto... vals> struct replicator_type {
   template <typename F> constexpr void operator>>(F body) const {
@@ -91,7 +81,7 @@ consteval auto create_variant(auto reflection) {
                                        members_of(reflection)});
 }
 
-template <typename Check, typename ...T>
-concept is_one_of = std::disjunction_v<std::is_same<Check,T>...>;
+template <typename Check, typename... T>
+concept is_one_of = std::disjunction_v<std::is_same<Check, T>...>;
 
 } // namespace form::util

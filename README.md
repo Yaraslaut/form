@@ -10,7 +10,7 @@ To test it you can use provided Dockerfile to get compiler and build project
 docker build . --progress=plain
 ```
 
-Some additional examples can be found in [proposal](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html)
+Some additional examples you can find in [proposal](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html)
 
 ## Create variant of all types inside namespace
 
@@ -22,16 +22,11 @@ struct ClearHistoryAndReset {};
 using list_variant = [:form::util::create_variant(^list):];
 ```
 
-## Enum/Variant to string 
+## Enum to string 
 
 ``` c++
 
 enum class Color { red, green, blue };
-
-void VariantToString() {
-  list_variant v{list::CancelSelection{}};
-  std::println("{}", form::variant_type_to_string(v)); // CancelSelection
-}
 
 void EnumToString() { 
   std::println("{}", form::enum_to_string(Color::red));  // red
@@ -39,49 +34,18 @@ void EnumToString() {
 
 ```
 
-## Universal formatter
-
-
+## Variant type to string
 
 ``` c++
 
-struct S {
-  unsigned i : 2, j : 6;
-};
-
-struct X {
-  int m1 = 1;
-};
-
-struct Y {
-  int m2 = 2;
-};
-
-class Z : public X, private Y {
-  int m3 = 3;
-  int m4 = 4;
-};
-
-
-template <typename T>
-  requires form::util::is_one_of<T, Z>
-struct std::formatter<T> : std::formatter<std::string> {
-  auto format(const T &val, std::format_context &ctx) const {
-    return std::format_to(ctx.out(), "{}",
-                          form::universal_formatter::format(val));
-  }
-};
-
-
-int main() {
-  std::println("{}", Z()); // Z{X{.m1=1}, Y{.m2=2}, .m3=3, .m4=4}
+void VariantToString() {
+  list_variant v{list::CancelSelection{}};
+  std::println("{}", form::variant_type_to_string(v)); // CancelSelection
 }
-
-
 ```
 
-
 ## Serialization into different formats 
+
 ```c++
 
 using ColumnCount = boxed::boxed<int>;
@@ -106,20 +70,24 @@ void SerializationIntoDifferentFormats() {
   std::println("{}", form::format_json(c));
   std::println("===== YAML =====");
   std::println("{}", form::format_yaml(c));
+  std::println("===== UNIVERSAL =====");
+  std::println("{}", form::format_universal(c));
 }
 
 /*
 ===== JSON =====
 {"live":false,"v":90,"b":90,page_size: {lines: {"value":10},columns: {"value":10}}}
 ===== YAML =====
-live: "false"
-v: "90"
-b: "90"
+live: false
+v: 90
+b: 90
 page_size:
   lines:
-    value: "10"
+    value: 10
   columns:
-    value: "10"
+    value: 10
+===== UNIVERSAL =====
+{.live=false,.v=90,.b=90,.page_size={.lines={.value=10},.columns={.value=10}}}
 */
 ```
 
@@ -164,5 +132,3 @@ void runTests() { form::run_tests<^for_tests>(); }
 */
 
 ```
-
-`

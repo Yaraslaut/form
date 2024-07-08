@@ -41,6 +41,8 @@ void SerializationIntoDifferentFormats() {
   std::println("{}", form::format_json(c));
   std::println("===== YAML =====");
   std::println("{}", form::format_yaml(c));
+  std::println("===== UNIVERSAL =====");
+  std::println("{}", form::format_universal(c));
 }
 
 void VariantToString() {
@@ -56,6 +58,5 @@ void runTests() { form::run_tests<^for_tests>(); }
 
 int main() {
   form::run_seq<^run>();
-
   return 0;
 }

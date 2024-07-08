@@ -32,21 +32,6 @@ constexpr std::string enum_to_string(E value) {
   return result;
 }
 
-template <typename T> std::string format_yaml(T const &t) {
-  return format<^yaml>(t);
-}
-
-template <typename T> std::string format_json(T const &t) {
-  return format<^json>(t);
-}
-
-template <typename T> T from_yaml(auto input) {
-  auto node = YAML::Load(input);
-  T t;
-  from_yaml_node(node, t);
-  return t;
-}
-
 template <typename T> bool compare(T const &lhs, T const &rhs) {
   bool result = true;
   if constexpr (std::is_arithmetic_v<T>)
