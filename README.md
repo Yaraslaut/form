@@ -12,16 +12,6 @@ docker build . --progress=plain
 
 Some additional examples you can find in [proposal](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html)
 
-## Create variant of all types inside namespace
-
-``` c++
-namespace list {
-struct CancelSelection {};
-struct ClearHistoryAndReset {};
-} // namespace list
-using list_variant = [:form::util::create_variant(^list):];
-```
-
 ## Enum to string 
 
 Transform enum directly to std::string
@@ -88,6 +78,17 @@ void PaddingCheck() {
 }
 
 
+```
+
+
+## Create variant of all types inside the namespace
+
+``` c++
+namespace list {
+struct CancelSelection {};
+struct ClearHistoryAndReset {};
+} // namespace list
+using list_variant = [:form::util::create_variant(^list):];
 ```
 
 
