@@ -102,6 +102,27 @@ template <typename T> constexpr void print_members() {
   };
 }
 
+template <typename S> consteval std::size_t get_padding() {
+
+  std::size_t padding{0};
+  std::size_t pointer{offset_of(nonstatic_data_members_of(^S)[0])};
+
+  [: util::expand(nonstatic_data_members_of(^S)):] >> [&, i = 0]<auto e>() {
+    if (pointer == offset_of(e))
+      pointer += size_of(e);
+    else {
+      padding += offset_of(e) - pointer;
+      pointer = offset_of(e) + size_of(e);
+    }
+  };
+  return padding;
+}
+
+template <typename T>
+concept no_padding =
+    std::same_as<std::integral_constant<std::size_t, get_padding<T>()>,
+                 std::integral_constant<std::size_t, 0>>;
+
 } // namespace form
 
 template <> struct std::formatter<std::basic_string_view<char8_t>> {

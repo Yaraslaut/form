@@ -36,7 +36,7 @@ void EnumToString() {
 
 ```
 
-If you want to apply some pattern to the formatting of enum value name
+Use lambda to format enum values following your pattern.
 
 ``` c++
 void EnumToString() { 
@@ -55,7 +55,41 @@ void EnumToString() {
 }
 ```
 
-`
+## Padding check at compile time
+
+Calculate padding at compile time and enforce zero padding via concepts
+
+``` c++
+
+
+struct struct_with_padding {
+  char a;
+  double c;
+};
+
+struct struct_no_padding {
+  double c;
+  char a;
+};
+
+template <form::no_padding T> void foo(T t) { 
+  std::println("Without padding"); 
+}
+
+template <typename T> void foo(T t) {
+  std::println("With padding: {}", form::get_padding<T>());
+}
+
+
+void PaddingCheck() {
+  foo(struct_with_padding{}); // With padding: 7
+  foo(struct_no_padding{});   // Without padding
+  static_assert(form::no_padding<struct_no_padding>);
+}
+
+
+```
+
 
 ## Variant type to string
 

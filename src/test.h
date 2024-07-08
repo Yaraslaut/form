@@ -334,6 +334,22 @@ enum class Decorator : uint8_t {
   Encircle,
 };
 
+struct struct_with_padding {
+  char a;
+  double c;
+};
+
+struct struct_no_padding {
+  double c;
+  char a;
+};
+
+template <form::no_padding T> void foo(T t) { std::println("Without padding"); }
+
+template <typename T> void foo(T t) {
+  std::println("With padding: {}", form::get_padding<T>());
+}
+
 namespace form::examples {
 bool VariantCreate() {
   list_variant v{list::CancelSelection{}};
@@ -364,6 +380,13 @@ bool EnumToStringWithTransform() {
   res &= (form::enum_to_string(Decorator::DottedUnderline, transform) ==
           "dotted-underline");
   return res;
+}
+
+void PaddingCheck() {
+
+  foo(struct_with_padding{});
+  foo(struct_no_padding{});
+  static_assert(form::no_padding<struct_no_padding>);
 }
 
 } // namespace form::examples
