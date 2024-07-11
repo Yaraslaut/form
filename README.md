@@ -190,3 +190,22 @@ void runTests() { form::run_tests<^for_tests>(); }
 */
 
 ```
+
+## extension of same_as concept to templates
+
+concept `form::same_as` checks if type represent specific template 
+
+``` c++
+
+template <typename T> int foo(T) { return -1; }
+
+template <typename T>
+  requires form::same_as<T, ^std::complex>
+int foo(T) {
+  return 1;
+}
+
+
+foo(std::complex<float>{1,1}); //1
+
+```

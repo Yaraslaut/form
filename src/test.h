@@ -2,6 +2,7 @@
 #pragma once
 #include <algorithm>
 #include <boxed-cpp/boxed.hpp>
+#include <complex>
 #include <form/form.h>
 #include <print>
 #include <thread>
@@ -173,6 +174,18 @@ template <typename T> constexpr auto CreateClass() {
 // clang-format on
 
 } // namespace detail
+
+namespace form_same_as {
+template <typename T> int foo(T) { return -1; }
+
+template <typename T>
+  requires form::same_as<T, ^std::complex>
+int foo(T) {
+  return 1;
+}
+
+} // namespace form_same_as
+
 namespace form::tests {
 
 void testZ() {
@@ -230,9 +243,8 @@ void testSJson() {
   s.j = 2;
   std::println("{}", form::format_json(s));
 }
-} // namespace form::tests
 
-namespace form::round_trip_tests {
+bool CheckSameAs() { return form_same_as::foo(std::complex<float>{1, 1}) == 1; }
 
 bool compareTrue() {
   return form::compare(3.0, 3.0) && form::compare(3, 3) &&
@@ -312,7 +324,7 @@ bool ConfigRoundTrip() {
   return round_trip(config);
 }
 
-} // namespace form::round_trip_tests
+} // namespace form::tests
 
 namespace list {
 struct CancelSelection {};
@@ -349,8 +361,8 @@ template <form::no_padding T> void foo(T t) { std::println("Without padding"); }
 template <typename T> void foo(T t) {
   std::println("With padding: {}", form::get_padding<T>());
 }
-
 namespace form::examples {
+
 bool VariantCreate() {
   list_variant v{list::CancelSelection{}};
   return std::holds_alternative<list::CancelSelection>(v);

@@ -107,7 +107,7 @@ template <typename S> consteval std::size_t get_padding() {
   std::size_t padding{0};
   std::size_t pointer{offset_of(nonstatic_data_members_of(^S)[0])};
 
-  [: util::expand(nonstatic_data_members_of(^S)):] >> [&, i = 0]<auto e>() {
+  [:util::expand(nonstatic_data_members_of(^S)):] >> [&, i = 0]<auto e>() {
     if (pointer == offset_of(e))
       pointer += size_of(e);
     else {
@@ -122,6 +122,9 @@ template <typename T>
 concept no_padding =
     std::same_as<std::integral_constant<std::size_t, get_padding<T>()>,
                  std::integral_constant<std::size_t, 0>>;
+
+template <typename T, auto refl>
+concept same_as = template_of(^T) == refl;
 
 } // namespace form
 
