@@ -104,15 +104,15 @@ template <typename T> constexpr void print_members() {
 
 template <typename S> consteval std::size_t get_padding() {
 
+  std::size_t pointer{offset_of(nonstatic_data_members_of(^S)[0]).bytes};
   std::size_t padding{0};
-  std::size_t pointer{offset_of(nonstatic_data_members_of(^S)[0])};
 
   [:util::expand(nonstatic_data_members_of(^S)):] >> [&, i = 0]<auto e>() {
-    if (pointer == offset_of(e))
+    if (pointer == offset_of(e).bytes)
       pointer += size_of(e);
     else {
-      padding += offset_of(e) - pointer;
-      pointer = offset_of(e) + size_of(e);
+      padding += offset_of(e).bytes - pointer;
+      pointer = offset_of(e).bytes + size_of(e);
     }
   };
   return padding;

@@ -198,8 +198,11 @@ void testZ() {
 void testPrintMembers() { form::print_members<Z>(); }
 
 void testCreateClass() {
-  constexpr auto cls = detail::CreateClass<detail::CreateUniqueT<int>>();
-  form::print_members<[:cls:]>();
+  using hidden_type = [:detail::CreateClass<detail::CreateUniqueT<int>>():];
+
+  constexpr hidden_type value{};
+  constexpr auto refl_of_value = ^value;
+  // form::print_members<[:type_of(refl_of_value):]>(); //TODO: Fix this
 }
 
 void testAA() {

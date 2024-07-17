@@ -9,7 +9,13 @@
 
 namespace form::util {
 
-consteval auto name_of(auto type) { return name_of<std::string_view>(type); }
+consteval auto name_of(auto refl) {
+  if (has_identifier(refl)) {
+    return identifier_of(refl);
+  } else {
+    return display_string_of(refl);
+  }
+}
 
 template <typename... Ts, typename F> constexpr void enumerate_types(F &&f) {
   [&f]<auto... Is>(std::index_sequence<Is...>) {
