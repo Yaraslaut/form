@@ -1,6 +1,7 @@
 #pragma once
 #include <form/util.h>
 #include <format>
+#include <type_traits>
 #include <yaml-cpp/yaml.h>
 
 namespace form {
@@ -47,6 +48,108 @@ void increase_level() {}
 void decrease_level() {}
 
 } // namespace universal
+
+namespace yaml {
+
+struct Node {
+
+  std::string_view _context;
+
+  Node(std::string_view c) : _context{c} {
+  }
+
+  template <typename T> T as() {
+
+    try {
+      return as_impl<T>();
+    } catch (std::exception &e) {
+      std::string error = e.what();
+      std::string_view error_view = error;
+      std::println("Error while parsing value: {} with context {}", error_view,
+                   _context);
+      return T{};
+    }
+  }
+
+  template <typename T> T as_impl() {
+    if constexpr (std::is_same_v<T, std::string>) {
+      return std::string(_context);
+    } else if constexpr (std::is_same_v<T, std::string_view>) {
+      return _context;
+    } else if constexpr (std::is_same_v<T, int>) {
+      return std::stoi(std::string(_context));
+    } else if constexpr (std::is_same_v<T, unsigned int>) {
+      return std::stoul(std::string(_context));
+    } else if constexpr (std::is_same_v<T, double>) {
+      return std::stod(std::string(_context));
+    } else if constexpr (std::is_same_v<T, bool>) {
+      return std::string(_context) == "true";
+    } else {
+      throw std::runtime_error(
+          std::format("Unsupported type {}", util::name_of(^T)));
+    }
+  }
+
+  Node operator[](std::string_view name_raw) const {
+    using namespace std::literals;
+
+    std::string name = std::string{name_raw} + ":";
+
+    auto lines = std::views::split(_context, '\n');
+
+    auto root_lines = lines | std::views::filter([](auto line) {
+                        return !std::string_view{line}.starts_with(' ');
+                      });
+
+    auto found_in_root = std::ranges::find_if(root_lines, [&](auto line) {
+      return std::string_view{line}.starts_with(name);
+    });
+
+    auto found_value = util::get_before(
+        util::get_after(std::string_view{*found_in_root}, ":"sv), "\n"sv);
+
+    // primitive type and entry is "name: value"
+    if (found_value.size() > 0) {
+      return Node{found_value};
+    }
+
+    const auto found_element_in_all_lines =
+        std::ranges::find_if(lines, [&](auto line) {
+          return std::string_view{line}.starts_with(name);
+        });
+    const auto next_element_in_all_lines =
+        std::ranges::find_if(lines, [&](auto line) {
+          return std::string_view{line}.starts_with(
+              std::string_view{*(std::next(found_in_root))});
+        });
+
+    // get lines between found and next
+    const auto found_index =
+        std::distance(lines.begin(), found_element_in_all_lines);
+    auto next_index = std::distance(lines.begin(), next_element_in_all_lines);
+
+    // if next element is not found, it is the last element in roots
+    if (next_index == 0)
+      next_index = std::distance(lines.begin(), lines.end());
+
+    auto found_element = lines | std::views::drop(found_index + 1) |
+                         std::views::take(next_index - found_index - 1) |
+                         std::views::transform([](auto line_view) {
+                           auto line = std::string_view{line_view};
+                           if (line.size() > 2)
+                             return line.substr(2);
+                           return line;
+                         });
+
+    std::string folded;
+    for (const auto line : found_element) {
+      folded += std::string{std::string_view{line}} + "\n";
+    }
+    return Node{folded};
+  }
+};
+
+} // namespace yaml
 
 template <auto refl, typename T> std::string format(T const &t) {
   std::string out;
@@ -102,7 +205,7 @@ template <auto refl, typename T> std::string format(T const &t) {
   return out;
 }
 
-template <typename T> void from_yaml_node(YAML::Node const &node, T &t) {
+template <typename T> void from_node(auto const &node, T &t) {
 
   util::for_range<0, util::number_of_members<T>()>([&]<auto I>() {
     constexpr auto mem = util::member_info<T>(I);
@@ -120,7 +223,7 @@ template <typename T> void from_yaml_node(YAML::Node const &node, T &t) {
                     node[name].template as<[:type_of_mem:]>());
     } else {
       // std::println("diving into: {}", name);
-      from_yaml_node(node[name], t.[:mem:]);
+      from_node(node[name], t.[:mem:]);
     }
   });
 
@@ -136,7 +239,7 @@ template <typename T> void from_yaml_node(YAML::Node const &node, T &t) {
               t.[:mem:] = node[name].template as<[:type_of(mem):]>();
             } else if constexpr (std::formattable<[:type_of(mem):], char>) {
             } else {
-              from_yaml_node(node[util::name_of(mem)], t.[:mem:]);
+              from_node(node[util::name_of(mem)], t.[:mem:]);
             }
           });
   });
@@ -155,9 +258,9 @@ template <typename T> std::string format_universal(T const &t) {
 }
 
 template <typename T> T from_yaml(auto input) {
-  auto node = YAML::Load(input);
+  auto node = yaml::Node(input);
   T t;
-  from_yaml_node(node, t);
+  from_node(node, t);
   return t;
 }
 

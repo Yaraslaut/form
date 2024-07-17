@@ -84,4 +84,20 @@ consteval auto create_variant(auto reflection) {
 template <typename Check, typename... T>
 concept is_one_of = std::disjunction_v<std::is_same<Check, T>...>;
 
+std::string_view get_after(std::string_view str, std::string_view delim) {
+  auto pos = str.find(delim);
+  if (pos == std::string_view::npos) {
+    return str;
+  }
+  return str.substr(pos + delim.size());
+}
+
+std::string_view get_before(std::string_view str, std::string_view delim) {
+  auto pos = str.find(delim);
+  if (pos == std::string_view::npos) {
+    return str;
+  }
+  return str.substr(0, pos);
+}
+
 } // namespace form::util
