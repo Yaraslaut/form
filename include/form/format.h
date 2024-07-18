@@ -55,8 +55,7 @@ struct Node {
 
   std::string_view _context;
 
-  Node(std::string_view c) : _context{c} {
-  }
+  Node(std::string_view c) : _context{c} {}
 
   template <typename T> T as() {
 

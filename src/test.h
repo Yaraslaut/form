@@ -202,7 +202,7 @@ void testCreateClass() {
 
   constexpr hidden_type value{};
   constexpr auto refl_of_value = ^value;
-  // form::print_members<[:type_of(refl_of_value):]>(); //TODO: Fix this
+  form::print_members<[:type_of(refl_of_value):]>();
 }
 
 void testAA() {

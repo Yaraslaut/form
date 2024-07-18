@@ -6,8 +6,6 @@ FROM ubuntu:latest
 #git clone -b p2996 https://github.com/bloomberg/clang-p2996.git && \
 WORKDIR /
 RUN apt-get update
-RUN apt-get install -y cmake python3 ninja-build git lsb-release software-properties-common wget binutils gcc g++
-#RUN bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 RUN bash -c "\
     set -ex && \
     apt-get install -y cmake python3 ninja-build git lsb-release software-properties-common wget binutils gcc g++ && \
