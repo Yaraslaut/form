@@ -2,6 +2,14 @@
 
 > Collection of static reflection usage examples 
 
+- [Enum to string](https://github.com/Yaraslaut/form#enum-to-string)
+- [Variant type to string](https://github.com/Yaraslaut/form#variant-type-to-string)
+- [Padding check at compile time](https://github.com/Yaraslaut/form#padding-check-at-compile-time)
+- [Create variant of all types inside the namespace](https://github.com/Yaraslaut/form#create-variant-of-all-types-inside-the-namespace)
+- [Serialization/Deserialization into different formats](https://github.com/Yaraslaut/form#serialization-into-different-formats) 
+- [Run all function from namespace in serial or parallel](https://github.com/Yaraslaut/form#run-all-function-from-namespace-in-serial-or-parallel)
+- [same_as concept for templates](https://github.com/Yaraslaut/form?tab=readme-ov-file#same_as-concept-for-templates)
+
 Collection utilize existing c++26 reflection support from [clang-p2996](https://github.com/bloomberg/clang-p2996/tree/p2996) 
 
 To test it you can use provided Dockerfile to get compiler and build project 
@@ -150,7 +158,7 @@ page_size:
 ```
 
 
-## Deserialization into different formats
+## Deserialization from different formats
 
 Only YAML supported at the moment
 
@@ -191,7 +199,7 @@ void runTests() { form::run_tests<^for_tests>(); }
 
 ```
 
-## extension of same_as concept to templates
+## same_as concept for templates
 
 concept `form::same_as` checks if type represent specific template 
 
