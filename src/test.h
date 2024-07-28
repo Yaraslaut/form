@@ -7,6 +7,15 @@
 #include <print>
 #include <thread>
 
+namespace log {
+
+template <class... Args>
+inline void println(std::format_string<Args...> fmt, Args &&...args) {
+  std::println(fmt, std::forward<Args>(args)...);
+}
+
+} // namespace log
+
 struct S {
   unsigned i : 2, j : 6;
 };
@@ -126,23 +135,23 @@ struct std::formatter<boxed::detail::boxed<A, B>> {
 };
 
 template <typename T> void serialize(T const &val) {
-  std::println("================================== [Serialized] YAML");
+  log::println("================================== [Serialized] YAML");
   auto data_yaml = form::format_yaml(val);
-  std::println("{}", data_yaml);
+  log::println("{}", data_yaml);
 
-  std::println("================================== [Serialized] JSON");
+  log::println("================================== [Serialized] JSON");
   auto data_json = form::format_json(val);
-  std::println("{}", data_json);
+  log::println("{}", data_json);
 }
 
 template <typename T> void deserialize(T const &val) {
-  std::println("================================== [Deserialized]");
+  log::println("================================== [Deserialized]");
   try {
     auto data = form::format_yaml(val);
     auto deserialized = form::from_yaml<T>(data);
-    std::println("{}", form::format_yaml(deserialized));
+    log::println("{}", form::format_yaml(deserialized));
   } catch (const std::exception &e) {
-    std::println("Failed");
+    log::println("{}", "Failed");
   }
 }
 
@@ -244,7 +253,7 @@ void testSJson() {
   S s;
   s.i = 1;
   s.j = 2;
-  std::println("{}", form::format_json(s));
+  log::println("{}", form::format_json(s));
 }
 
 bool CheckSameAs() { return form_same_as::foo(std::complex<float>{1, 1}) == 1; }
@@ -359,10 +368,10 @@ struct struct_no_padding {
   char a;
 };
 
-template <form::no_padding T> void foo(T t) { std::println("Without padding"); }
+template <form::no_padding T> void foo(T t) { log::println("Without padding"); }
 
 template <typename T> void foo(T t) {
-  std::println("With padding: {}", form::get_padding<T>());
+  log::println("With padding: {}", form::get_padding<T>());
 }
 namespace form::examples {
 
@@ -407,7 +416,7 @@ void PaddingCheck() {
 } // namespace form::examples
 
 void ExampleConfig() {
-  std::println("{}", form::format_yaml([]() {
+  log::println("{}", form::format_yaml([]() {
                  Config c;
                  c.b = 3.1;
                  c.v = 10;
