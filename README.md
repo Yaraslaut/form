@@ -79,8 +79,6 @@ void EnumToString() {
 Calculate padding at compile time and enforce zero padding via concepts
 
 ``` c++
-
-
 struct struct_with_padding {
   char a;
   double c;
@@ -105,7 +103,6 @@ void PaddingCheck() {
   foo(struct_no_padding{});   // Without padding
   static_assert(form::no_padding<struct_no_padding>);
 }
-
 
 ```
 
@@ -183,14 +180,12 @@ Only YAML supported at the moment
 
 ``` c++
 
-int main() {
+int fromYAML() {
   Config c;
 
   auto yaml_input = form::format_yaml(c);
 
   auto from_yaml = form::from_yaml<Config>(yaml_input);
-
-  return form::compare(c,from_yaml);
 }
 
 ```
@@ -232,7 +227,6 @@ int foo(T) {
   return 1;
 }
 
-
-foo(std::complex<float>{1,1}); //1
+foo(std::complex<float>{1.0f,1.0f}); //1
 
 ```
