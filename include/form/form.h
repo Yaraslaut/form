@@ -68,12 +68,6 @@ constexpr std::optional<E> string_to_enum(std::string_view value) {
   return detail::string_to_enum<std::optional<E>>(value);
 }
 
-template <typename E>
-  requires std::is_enum_v<E>
-constexpr E string_to_enum_no_check(std::string_view value) {
-  return detail::string_to_enum<E>(value);
-}
-
 template <typename T> bool compare(T const &lhs, T const &rhs) {
   bool result = true;
   if constexpr (std::is_arithmetic_v<T>)

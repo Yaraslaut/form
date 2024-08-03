@@ -411,7 +411,6 @@ bool StringToEnum() {
   res &= form::string_to_enum<Color>("red").value() == Color::red;
   res &= form::string_to_enum<Color>("green").value() == Color::green;
   res &= form::string_to_enum<Color>("blue").value() == Color::blue;
-  res &= form::string_to_enum_no_check<Color>("asdf") == Color::red;
   return res;
 }
 

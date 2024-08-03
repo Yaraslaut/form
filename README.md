@@ -68,7 +68,7 @@ Transform string directly to enum
 enum class Color { red, green, blue };
 
 void EnumToString() {
-  auto color = form::string_to_enum<Color>("red");
+  auto color = form::string_to_enum<Color>("red").value();
 }
 
 ```
