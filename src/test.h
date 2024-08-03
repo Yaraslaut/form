@@ -11,7 +11,9 @@ namespace log {
 
 template <class... Args>
 inline void println(std::format_string<Args...> fmt, Args &&...args) {
+#if 0
   std::println(fmt, std::forward<Args>(args)...);
+#endif
 }
 
 } // namespace log
@@ -169,7 +171,7 @@ struct ConfigEntries {
   // ConfigEntry<StrongType, documentation::Dummy> strong_entry;
 };
 
-namespace detail {
+namespace helper {
 
 template <typename T, typename Tag = decltype([] {})> struct CreateUniqueT;
 
@@ -182,7 +184,7 @@ template <typename T> constexpr auto CreateClass() {
 }
 // clang-format on
 
-} // namespace detail
+} // namespace helper
 
 namespace form_same_as {
 template <typename T> int foo(T) { return -1; }
@@ -204,14 +206,12 @@ void testZ() {
   deserialize(z);
 }
 
-void testPrintMembers() { form::print_members<Z>(); }
-
 void testCreateClass() {
-  using hidden_type = [:detail::CreateClass<detail::CreateUniqueT<int>>():];
+  using hidden_type = [:helper::CreateClass<helper::CreateUniqueT<int>>():];
 
   constexpr hidden_type value{};
   constexpr auto refl_of_value = ^value;
-  form::print_members<[:type_of(refl_of_value):]>();
+  // util::print_members<[:type_of(refl_of_value):]>();
 }
 
 void testAA() {
@@ -403,6 +403,15 @@ bool EnumToStringWithTransform() {
   res &= (form::enum_to_string(Decorator::Underline, transform) == "underline");
   res &= (form::enum_to_string(Decorator::DottedUnderline, transform) ==
           "dotted-underline");
+  return res;
+}
+
+bool StringToEnum() {
+  bool res = true;
+  res &= form::string_to_enum<Color>("red").value() == Color::red;
+  res &= form::string_to_enum<Color>("green").value() == Color::green;
+  res &= form::string_to_enum<Color>("blue").value() == Color::blue;
+  res &= form::string_to_enum_no_check<Color>("asdf") == Color::red;
   return res;
 }
 

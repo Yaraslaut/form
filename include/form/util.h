@@ -106,4 +106,11 @@ std::string_view get_before(std::string_view str, std::string_view delim) {
   return str.substr(0, pos);
 }
 
+template <typename T> constexpr void print_members() {
+  std::println("Members of: {}", util::name_of(^T));
+  [:util::expand(nonstatic_data_members_of(^T)):] >> [&]<auto mem> {
+    std::println("{}", util::name_of(mem));
+  };
+}
+
 } // namespace form::util

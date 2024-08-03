@@ -10,6 +10,30 @@
 
 namespace form {
 
+namespace detail {
+using namespace form;
+
+template <typename Inner>
+constexpr Inner string_to_enum(std::string_view value) {
+  Inner result{};
+
+  constexpr auto enum_type = []<typename Check>(this auto self, Check) {
+    if constexpr (std::is_enum_v<Check>) {
+      return ^Check;
+    } else {
+      return self(typename Check::value_type{});
+    }
+  }(Inner{});
+
+  [:util::expand(std::meta::enumerators_of(enum_type)):] >> [&]<auto e> {
+    if (value == util::name_of(e)) {
+      result = [:e:];
+    }
+  };
+  return result;
+}
+} // namespace detail
+
 template <typename E> constexpr std::string variant_type_to_string(E value) {
   std::string out = "";
   [:util::expand(template_arguments_of(^E)):] >> [&]<auto e> {
@@ -36,6 +60,18 @@ template <typename E>
   requires std::is_enum_v<E>
 constexpr std::string enum_to_string(E value, auto transformation) {
   return transformation(enum_to_string(value));
+}
+
+template <typename E>
+  requires std::is_enum_v<E>
+constexpr std::optional<E> string_to_enum(std::string_view value) {
+  return detail::string_to_enum<std::optional<E>>(value);
+}
+
+template <typename E>
+  requires std::is_enum_v<E>
+constexpr E string_to_enum_no_check(std::string_view value) {
+  return detail::string_to_enum<E>(value);
 }
 
 template <typename T> bool compare(T const &lhs, T const &rhs) {
@@ -79,8 +115,9 @@ template <auto refl> void run_tests() {
                         std::invoke_result_t<typename[:type_of(mem):]>, bool>) {
         if ([:mem:]())
           std::format_to(std::back_inserter(out), "{}", "\N{FIRE}");
-        else
+        else {
           std::format_to(std::back_inserter(out), "{}", "\N{PILE OF POO}");
+        }
       } else {
         [:mem:]();
         std::format_to(std::back_inserter(out), "{}", "\N{FOUR LEAF CLOVER}");
@@ -93,13 +130,6 @@ template <auto refl> void run_tests() {
   for (auto &t : pool) {
     t.join();
   }
-}
-
-template <typename T> constexpr void print_members() {
-  std::println("Members of: {}", util::name_of(^T));
-  [:util::expand(nonstatic_data_members_of(^T)):] >> [&]<auto mem> {
-    std::println("{}", util::name_of(mem));
-  };
 }
 
 template <typename S> consteval std::size_t get_padding() {

@@ -3,6 +3,7 @@
 > Collection of static reflection usage examples 
 
 - [Enum to string](https://github.com/Yaraslaut/form#enum-to-string)
+- [String to enum](https://github.com/Yaraslaut/form#string-to-enum)
 - [Variant type to string](https://github.com/Yaraslaut/form#variant-type-to-string)
 - [Padding check at compile time](https://github.com/Yaraslaut/form#padding-check-at-compile-time)
 - [Create variant of all types inside the namespace](https://github.com/Yaraslaut/form#create-variant-of-all-types-inside-the-namespace)
@@ -53,6 +54,21 @@ void EnumToString() {
 }
 ```
 
+
+## String to enum
+Transform string directly to enum
+
+``` c++
+
+enum class Color { red, green, blue };
+
+void EnumToString() {
+  auto color = form::string_to_enum<Color>("red");
+}
+
+```
+
+
 ## Padding check at compile time
 
 Calculate padding at compile time and enforce zero padding via concepts
@@ -88,7 +104,6 @@ void PaddingCheck() {
 
 ```
 
-
 ## Create variant of all types inside the namespace
 
 ``` c++
@@ -98,7 +113,6 @@ struct ClearHistoryAndReset {};
 } // namespace list
 using list_variant = [:form::util::create_variant(^list):];
 ```
-
 
 ## Variant type to string
 
