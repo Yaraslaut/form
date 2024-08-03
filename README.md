@@ -2,14 +2,19 @@
 
 > Collection of static reflection usage examples 
 
-- [Enum to string](https://github.com/Yaraslaut/form#enum-to-string)
-- [String to enum](https://github.com/Yaraslaut/form#string-to-enum)
-- [Variant type to string](https://github.com/Yaraslaut/form#variant-type-to-string)
-- [Padding check at compile time](https://github.com/Yaraslaut/form#padding-check-at-compile-time)
 - [Create variant of all types inside the namespace](https://github.com/Yaraslaut/form#create-variant-of-all-types-inside-the-namespace)
-- [Serialization/Deserialization into different formats](https://github.com/Yaraslaut/form#serialization-into-different-formats) 
+- [Enum to string](https://github.com/Yaraslaut/form#enum-to-string)
+- Getting Class Layout [P2996 paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html#getting-class-layout)
+- List of Types to List of Sizes [P2996 paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html#list-of-types-to-list-of-sizes)
+- Named Tuple [P2996 paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html#named-tuple) 
+- [Padding check at compile time](https://github.com/Yaraslaut/form#padding-check-at-compile-time)
+- Parsing Command-Line options [P2996 paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html#parsing-command-line-options-ii)
 - [Run all function from namespace in serial or parallel](https://github.com/Yaraslaut/form#run-all-function-from-namespace-in-serial-or-parallel)
 - [same_as concept for templates](https://github.com/Yaraslaut/form?tab=readme-ov-file#same_as-concept-for-templates)
+- [Serialization/Deserialization into different formats](https://github.com/Yaraslaut/form#serialization-into-different-formats) 
+- [String to enum](https://github.com/Yaraslaut/form#string-to-enum)
+- Struct to struct of Arrays [P2996 paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html#struct-to-struct-of-arrays)
+- [Variant type to string](https://github.com/Yaraslaut/form#variant-type-to-string)
 
 Collection utilize existing c++26 reflection support from [clang-p2996](https://github.com/bloomberg/clang-p2996/tree/p2996) 
 
@@ -19,7 +24,7 @@ To test it you can use provided Dockerfile to get compiler and build project
 docker build . --progress=plain
 ```
 
-Some additional examples you can find in [proposal](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2996r3.html)
+
 
 ## Enum to string 
 
