@@ -11,7 +11,6 @@ RUN wget https://apt.llvm.org/llvm.sh
 RUN chmod +x llvm.sh
 RUN ./llvm.sh 19
 RUN git clone -b p2996 https://github.com/bloomberg/clang-p2996.git
-RUN cd /clang-p2996 && git reset HEAD~1 --hard
 RUN cmake -S /clang-p2996/llvm \
         -B build \
         -G Ninja \

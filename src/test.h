@@ -126,16 +126,6 @@ struct std::formatter<ConfigEntry<A, B>> {
   }
 };
 
-template <typename A, typename B>
-struct std::formatter<boxed::detail::boxed<A, B>> {
-  using Boxed = boxed::detail::boxed<A, B>;
-  constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
-
-  auto format(const Boxed &obj, format_context &ctx) const {
-    return std::format_to(ctx.out(), "{}", obj.value);
-  }
-};
-
 template <typename T> void serialize(T const &val) {
   log::println("================================== [Serialized] YAML");
   auto data_yaml = form::format_yaml(val);
