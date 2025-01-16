@@ -36,23 +36,23 @@ template <auto B, auto E, typename F> constexpr void for_range(F &&f) {
 }
 
 template <typename T> consteval auto member_info(int n) {
-  return nonstatic_data_members_of(^T)[n];
+  return nonstatic_data_members_of(^^T)[n];
 }
 
 template <typename T> consteval auto base_info(int n) {
-  return bases_of(^T)[n];
+  return bases_of(^^T)[n];
 }
 
 template <typename T> consteval auto template_arguments(int n) {
-  return template_arguments_of(^T)[n];
+  return template_arguments_of(^^T)[n];
 }
 
 template <typename T> consteval auto number_of_members() {
-  return nonstatic_data_members_of(^T).size();
+  return nonstatic_data_members_of(^^T).size();
 }
 
 template <typename T> consteval auto number_of_base() {
-  return bases_of(^T).size();
+  return bases_of(^^T).size();
 }
 
 namespace __impl {
@@ -70,7 +70,7 @@ template <typename R> consteval auto expand(R range) {
   for (auto r : range) {
     args.push_back(reflect_value(r));
   }
-  return substitute(^__impl::replicator, args);
+  return substitute(^^__impl::replicator, args);
 }
 
 template <typename T, typename F> T construct_from(F f) { return T{f}; }
@@ -78,12 +78,12 @@ template <typename T, typename F> T construct_from(F f) { return T{f}; }
 /**
  *
  * reflection of namespace
- * using variant_type = [:create_variant(^namespace):];
+ * using variant_type = [:create_variant(^^namespace):];
  *
  **/
 consteval auto create_variant(auto reflection) {
 
-  return substitute(^std::variant, std::vector{
+  return substitute(^^std::variant, std::vector{
                                        members_of(reflection)});
 }
 
@@ -107,8 +107,8 @@ std::string_view get_before(std::string_view str, std::string_view delim) {
 }
 
 template <typename T> constexpr void print_members() {
-  std::println("Members of: {}", util::name_of(^T));
-  [:util::expand(nonstatic_data_members_of(^T)):] >> [&]<auto mem> {
+  std::println("Members of: {}", util::name_of(^^T));
+  [:util::expand(nonstatic_data_members_of(^^T)):] >> [&]<auto mem> {
     std::println("{}", util::name_of(mem));
   };
 }

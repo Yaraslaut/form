@@ -166,11 +166,12 @@ namespace helper {
 template <typename T, typename Tag = decltype([] {})> struct CreateUniqueT;
 
 // clang-format off
-template <typename T> constexpr auto CreateClass() {
-  return define_class(^T, {
-    data_member_spec(^int,{.name = "i"}),
-    data_member_spec(^int, {.name = "j"})
+template <typename T> consteval bool CreateClass() {
+  define_aggregate(^^T, {
+    data_member_spec(^^int,{.name = "i"}),
+    data_member_spec(^^int, {.name = "j"})
   });
+  return true;
 }
 // clang-format on
 
@@ -180,7 +181,7 @@ namespace form_same_as {
 template <typename T> int foo(T) { return -1; }
 
 template <typename T>
-  requires form::same_as<T, ^std::complex>
+  requires form::same_as<T, ^^std::complex>
 int foo(T) {
   return 1;
 }
@@ -197,10 +198,11 @@ void testZ() {
 }
 
 void testCreateClass() {
-  using hidden_type = [:helper::CreateClass<helper::CreateUniqueT<int>>():];
+  using hidden_type = helper::CreateUniqueT<int>;
+  constexpr bool create_hidden_type = helper::CreateClass<hidden_type>();
 
   constexpr hidden_type value{};
-  constexpr auto refl_of_value = ^value;
+  constexpr auto refl_of_value = ^^value;
   // util::print_members<[:type_of(refl_of_value):]>();
 }
 
@@ -332,7 +334,7 @@ namespace list {
 struct CancelSelection {};
 struct ClearHistoryAndReset {};
 } // namespace list
-using list_variant = [:form::util::create_variant(^list):];
+using list_variant = [:form::util::create_variant(^^list):];
 
 enum class Color { red, green, blue };
 

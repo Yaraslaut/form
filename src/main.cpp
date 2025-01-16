@@ -24,7 +24,7 @@ namespace list {
 struct CancelSelection {};
 struct ClearHistoryAndReset {};
 } // namespace list
-using list_variant = [:form::util::create_variant(^list):];
+using list_variant = [:form::util::create_variant(^^list):];
 
 enum class Color { red, green, blue };
 
@@ -53,11 +53,11 @@ void VariantToString() {
 
 void EnumToString() { std::println("{}", form::enum_to_string(Color::red)); }
 
-void runTests() { form::run_tests<^for_tests>(); }
+void runTests() { form::run_tests<^^for_tests>(); }
 
 } // namespace run
 
 int main() {
-  form::run_seq<^run>();
+  form::run_seq<^^run>();
   return 0;
 }

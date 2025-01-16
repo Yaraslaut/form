@@ -19,7 +19,7 @@ constexpr Inner string_to_enum(std::string_view value) {
 
   constexpr auto enum_type = []<typename Check>(this auto self, Check) {
     if constexpr (std::is_enum_v<Check>) {
-      return ^Check;
+      return ^^Check;
     } else {
       return self(typename Check::value_type{});
     }
@@ -36,7 +36,7 @@ constexpr Inner string_to_enum(std::string_view value) {
 
 template <typename E> constexpr std::string variant_type_to_string(E value) {
   std::string out = "";
-  [:util::expand(template_arguments_of(^E)):] >> [&]<auto e> {
+  [:util::expand(template_arguments_of(^^E)):] >> [&]<auto e> {
     if (auto *pval = std::get_if<typename[:e:]>(&value)) {
       std::format_to(std::back_inserter(out), "{}", util::name_of(e));
     }
@@ -48,7 +48,7 @@ template <typename E>
   requires std::is_enum_v<E>
 constexpr std::string enum_to_string(E value) {
   std::string result = "<unnamed>";
-  [:util::expand(std::meta::enumerators_of(^E)):] >> [&]<auto e> {
+  [:util::expand(std::meta::enumerators_of(^^E)):] >> [&]<auto e> {
     if (value == [:e:]) {
       result = util::name_of(e);
     }
@@ -128,10 +128,10 @@ template <auto refl> void run_tests() {
 
 template <typename S> consteval std::size_t get_padding() {
 
-  std::size_t pointer{offset_of(nonstatic_data_members_of(^S)[0]).bytes};
+  std::size_t pointer{offset_of(nonstatic_data_members_of(^^S)[0]).bytes};
   std::size_t padding{0};
 
-  [:util::expand(nonstatic_data_members_of(^S)):] >> [&, i = 0]<auto e>() {
+  [:util::expand(nonstatic_data_members_of(^^S)):] >> [&, i = 0]<auto e>() {
     if (pointer == offset_of(e).bytes)
       pointer += size_of(e);
     else {
@@ -148,7 +148,7 @@ concept no_padding =
                  std::integral_constant<std::size_t, 0>>;
 
 template <typename T, auto refl>
-concept same_as = template_of(^T) == refl;
+concept same_as = template_of(^^T) == refl;
 
 } // namespace form
 

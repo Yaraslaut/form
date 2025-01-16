@@ -203,7 +203,7 @@ bool test_false() { return false; }
 void test_void() {};
 } // namespace for_tests
 
-void runTests() { form::run_tests<^for_tests>(); }
+void runTests() { form::run_tests<^^for_tests>(); }
 
 /*
  🔥 test_true

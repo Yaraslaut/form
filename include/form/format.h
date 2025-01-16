@@ -85,7 +85,7 @@ struct Node {
       return std::string(_context) == "true";
     } else {
       throw std::runtime_error(
-          std::format("Unsupported type {}", util::name_of(^T)));
+          std::format("Unsupported type {}", util::name_of(^^T)));
     }
   }
 
@@ -163,11 +163,9 @@ template <auto refl, typename T> std::string format(T const &t) {
   std::format_to(std::back_inserter(out), "{}", [:refl:] ::start());
   util::for_range<0, util::number_of_base<T>()>([&]<auto I>() {
     constexpr auto base = util::base_info<T>(I);
-    if constexpr (is_accessible(base)) {
-      delim();
-      std::format_to(std::back_inserter(out), std::runtime_format("{}"),
-                     format<refl>(static_cast<[:type_of(base):] const &>(t)));
-    }
+    delim();
+    std::format_to(std::back_inserter(out), "{}",
+                   format<refl>((typename [:type_of(base):] const & )(t)));
   });
 
   util::for_range<0, util::number_of_members<T>()>([&]<auto I>() {
@@ -228,32 +226,31 @@ template <typename T> void from_node(auto const &node, T &t) {
 
   util::for_range<0, util::number_of_base<T>()>([&]<auto I>() {
     constexpr auto base = util::base_info<T>(I);
-    if constexpr (is_accessible(base))
-      util::for_range<0, util::number_of_members<[:type_of(base):]>()>(
-          [&]<auto II>() {
-            constexpr auto mem = util::member_info<[:type_of(base):]>(II);
-            if constexpr (std::is_arithmetic_v<[:type_of(mem):]> ||
-                          std::same_as<[:type_of(mem):], std::string>) {
-              auto name = std::string{util::name_of(mem)};
-              t.[:mem:] = node[name].template as<[:type_of(mem):]>();
-            } else if constexpr (std::formattable<[:type_of(mem):], char>) {
-            } else {
-              from_node(node[util::name_of(mem)], t.[:mem:]);
-            }
-          });
+    util::for_range<0, util::number_of_members<[:type_of(base):]>()>(
+        [&]<auto II>() {
+          constexpr auto mem = util::member_info<[:type_of(base):]>(II);
+          if constexpr (std::is_arithmetic_v<[:type_of(mem):]> ||
+                        std::same_as<[:type_of(mem):], std::string>) {
+            auto name = std::string{util::name_of(mem)};
+            t.[:mem:] = node[name].template as<[:type_of(mem):]>();
+          } else if constexpr (std::formattable<[:type_of(mem):], char>) {
+          } else {
+            from_node(node[util::name_of(mem)], t.[:mem:]);
+          }
+        });
   });
 }
 
 template <typename T> std::string format_yaml(T const &t) {
-  return format<^yaml>(t);
+  return format<^^yaml>(t);
 }
 
 template <typename T> std::string format_json(T const &t) {
-  return format<^json>(t);
+  return format<^^json>(t);
 }
 
 template <typename T> std::string format_universal(T const &t) {
-  return format<^universal>(t);
+  return format<^^universal>(t);
 }
 
 template <typename T> T from_yaml(auto input) {
