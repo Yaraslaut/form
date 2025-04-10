@@ -36,11 +36,12 @@ template <auto B, auto E, typename F> constexpr void for_range(F &&f) {
 }
 
 template <typename T> consteval auto member_info(int n) {
-  return nonstatic_data_members_of(^^T)[n];
+  return nonstatic_data_members_of(^^T,
+                                   std::meta::access_context::unchecked())[n];
 }
 
 template <typename T> consteval auto base_info(int n) {
-  return bases_of(^^T)[n];
+  return bases_of(^^T, std::meta::access_context::unchecked())[n];
 }
 
 template <typename T> consteval auto template_arguments(int n) {
@@ -48,11 +49,12 @@ template <typename T> consteval auto template_arguments(int n) {
 }
 
 template <typename T> consteval auto number_of_members() {
-  return nonstatic_data_members_of(^^T).size();
+  return nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())
+      .size();
 }
 
 template <typename T> consteval auto number_of_base() {
-  return bases_of(^^T).size();
+  return bases_of(^^T, std::meta::access_context::unchecked()).size();
 }
 
 namespace __impl {
@@ -83,8 +85,10 @@ template <typename T, typename F> T construct_from(F f) { return T{f}; }
  **/
 consteval auto create_variant(auto reflection) {
 
-  return substitute(^^std::variant, std::vector{
-                                       members_of(reflection)});
+  return substitute(
+      ^^std::variant,
+      std::vector{
+          members_of(reflection, std::meta::access_context::unchecked())});
 }
 
 template <typename Check, typename... T>
@@ -108,7 +112,8 @@ std::string_view get_before(std::string_view str, std::string_view delim) {
 
 template <typename T> constexpr void print_members() {
   std::println("Members of: {}", util::name_of(^^T));
-  [:util::expand(nonstatic_data_members_of(^^T)):] >> [&]<auto mem> {
+  [:util::expand(nonstatic_data_members_of(
+        ^^T, std::meta::access_context::unchecked())):] >> [&]<auto mem> {
     std::println("{}", util::name_of(mem));
   };
 }

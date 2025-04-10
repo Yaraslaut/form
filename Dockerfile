@@ -1,8 +1,8 @@
 # docker build . -t reflection --progress=plain
 # clang++ -std=c++26 -freflection -stdlib=libc++
 
-FROM yaraslaut/clang-p2996:latest
-#FROM clang-p2996
+#FROM yaraslaut/clang-p2996:latest
+FROM clang-p2996
 
 COPY . /mnt/src
 WORKDIR /mnt/src

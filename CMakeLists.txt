@@ -8,7 +8,7 @@ project(form
 )
 
 set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_CXX_FLAGS "-freflection -stdlib=libc++ ")
+set(CMAKE_CXX_FLAGS "-freflection -freflection-latest -stdlib=libc++ ")
 
 file(
   DOWNLOAD

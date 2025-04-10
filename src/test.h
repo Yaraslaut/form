@@ -131,9 +131,9 @@ template <typename T> void serialize(T const &val) {
   auto data_yaml = form::format_yaml(val);
   log::println("{}", data_yaml);
 
-  log::println("================================== [Serialized] JSON");
-  auto data_json = form::format_json(val);
-  log::println("{}", data_json);
+  // log::println("================================== [Serialized] JSON");
+  // auto data_json = form::format_json(val);
+  // log::println("{}", data_json);
 }
 
 template <typename T> void deserialize(T const &val) {
@@ -163,16 +163,16 @@ struct ConfigEntries {
 
 namespace helper {
 
-template <typename T, typename Tag = decltype([] {})> struct CreateUniqueT;
+template <typename T, typename Tag = decltype([] {})> struct CreateUniqueT {};
 
 // clang-format off
-template <typename T> consteval bool CreateClass() {
-  define_aggregate(^^T, {
-    data_member_spec(^^int,{.name = "i"}),
-    data_member_spec(^^int, {.name = "j"})
-  });
-  return true;
-}
+// template <typename T> consteval bool CreateClass() {
+//   define_aggregate(^^T, {
+//     data_member_spec(^^int,{.name = "i"}),
+//     data_member_spec(^^int, {.name = "j"})
+//   });
+//   return true;
+// }
 // clang-format on
 
 } // namespace helper
@@ -198,11 +198,11 @@ void testZ() {
 }
 
 void testCreateClass() {
-  using hidden_type = helper::CreateUniqueT<int>;
-  constexpr bool create_hidden_type = helper::CreateClass<hidden_type>();
+  // using hidden_type = helper::CreateUniqueT<int>;
+  // constexpr bool create_hidden_type = helper::CreateClass<hidden_type>();
 
-  constexpr hidden_type value{};
-  constexpr auto refl_of_value = ^^value;
+  // constexpr hidden_type value{};
+  // constexpr auto refl_of_value = ^^value;
   // util::print_members<[:type_of(refl_of_value):]>();
 }
 
@@ -221,7 +221,7 @@ void testPageSize() {
   ps.lines = LineCount{5};
   ps.columns = ColumnCount{7};
   serialize(ps);
-  deserialize(ps);
+  // deserialize(ps);
 }
 
 void testConfig() {

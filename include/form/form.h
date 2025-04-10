@@ -84,7 +84,8 @@ template <typename T> bool compare(T const &lhs, T const &rhs) {
 
 template <auto refl> void run_par() {
   std::vector<std::thread> pool;
-  [:util::expand(members_of(refl)):] >> [&]<auto mem> {
+  [:util::expand(
+        members_of(refl, std::meta::access_context::unchecked())):] >> [&]<auto mem> {
     pool.emplace_back(std::thread([&]() { [:mem:](); }));
   };
 
@@ -94,14 +95,16 @@ template <auto refl> void run_par() {
 }
 
 template <auto refl> void run_seq() {
-  [:util::expand(members_of(refl)):] >> [&]<auto mem> { [:mem:](); };
+  [:util::expand(members_of(
+        refl, std::meta::access_context::unchecked())):] >> [&]<auto mem> { [:mem:](); };
 }
 
 template <auto refl> void run_tests() {
   std::vector<std::thread> pool;
-  [:util::expand(members_of(refl)
-                 ):] >> [&]<auto mem>
-                       requires std::invocable<typename[:type_of(mem):]>
+  [:util::expand(members_of(
+        refl, std::meta::access_context::unchecked())):] >> [&]<auto mem>
+                                                requires std::invocable<
+                                                    typename[:type_of(mem):]>
   {
     pool.emplace_back(std::thread([&]() {
       std::string out;
@@ -128,10 +131,13 @@ template <auto refl> void run_tests() {
 
 template <typename S> consteval std::size_t get_padding() {
 
-  std::size_t pointer{offset_of(nonstatic_data_members_of(^^S)[0]).bytes};
+  std::size_t pointer{static_cast<size_t>(
+      offset_of(nonstatic_data_members_of(^^S, std::meta::access_context::unchecked())[0])
+          .bytes)};
   std::size_t padding{0};
 
-  [:util::expand(nonstatic_data_members_of(^^S)):] >> [&, i = 0]<auto e>() {
+  [:util::expand(nonstatic_data_members_of(
+        ^^S, std::meta::access_context::unchecked())):] >> [&, i = 0]<auto e>() {
     if (pointer == offset_of(e).bytes)
       pointer += size_of(e);
     else {
