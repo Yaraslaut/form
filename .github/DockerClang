@@ -9,13 +9,13 @@ RUN apt-get update
 RUN apt-get install -y cmake python3 ninja-build git lsb-release software-properties-common wget binutils gcc g++
 RUN wget https://apt.llvm.org/llvm.sh
 RUN chmod +x llvm.sh
-RUN ./llvm.sh 19
+RUN ./llvm.sh 20
 RUN git clone -b p2996 https://github.com/bloomberg/clang-p2996.git
 RUN cmake -S /clang-p2996/llvm \
         -B build \
         -G Ninja \
-        -D CMAKE_CXX_COMPILER=clang++-19 \
-        -D CMAKE_C_COMPILER=clang-19 \
+        -D CMAKE_CXX_COMPILER=clang++-20 \
+        -D CMAKE_C_COMPILER=clang-20 \
         -D CMAKE_BUILD_TYPE=Release \
         -D LLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'\
         -D LLVM_ENABLE_PROJECTS=clang\
