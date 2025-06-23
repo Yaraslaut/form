@@ -8,6 +8,8 @@
 #include <thread>
 #include <type_traits>
 
+// clang-format off
+
 namespace form {
 
 namespace detail {
@@ -46,14 +48,13 @@ template <typename E> constexpr std::string variant_type_to_string(E value) {
 
 template <typename E>
   requires std::is_enum_v<E>
-constexpr std::string enum_to_string(E value) {
-  std::string result = "<unnamed>";
-  [:util::expand(std::meta::enumerators_of(^^E)):] >> [&]<auto e> {
+constexpr std::string_view enum_to_string(E value) {
+  template for(constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
     if (value == [:e:]) {
-      result = util::name_of(e);
+      return util::name_of(e);
     }
-  };
-  return result;
+  }
+  return std::string_view("<unnamed>");
 }
 
 template <typename E>
@@ -73,30 +74,13 @@ template <typename T> bool compare(T const &lhs, T const &rhs) {
   if constexpr (std::is_arithmetic_v<T>)
     return lhs == rhs;
   if constexpr (std::is_class_v<T>)
-    util::for_range<0, util::number_of_members<T>()>([&]<auto I>() {
-      constexpr auto mem = util::member_info<T>(I);
+    template for(constexpr auto mem : std::define_static_array(nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())))
+    {
       if (!compare(lhs.[:mem:], rhs.[:mem:])) {
         result = result && false;
       }
-    });
+    }
   return result;
-}
-
-template <auto refl> void run_par() {
-  std::vector<std::thread> pool;
-  [:util::expand(
-        members_of(refl, std::meta::access_context::unchecked())):] >> [&]<auto mem> {
-    pool.emplace_back(std::thread([&]() { [:mem:](); }));
-  };
-
-  for (auto &t : pool) {
-    t.join();
-  }
-}
-
-template <auto refl> void run_seq() {
-  [:util::expand(members_of(
-        refl, std::meta::access_context::unchecked())):] >> [&]<auto mem> { [:mem:](); };
 }
 
 template <auto refl> void run_tests() {
@@ -131,20 +115,18 @@ template <auto refl> void run_tests() {
 
 template <typename S> consteval std::size_t get_padding() {
 
-  std::size_t pointer{static_cast<size_t>(
-      offset_of(nonstatic_data_members_of(^^S, std::meta::access_context::unchecked())[0])
-          .bytes)};
+  std::size_t pointer{static_cast<size_t>(offset_of(nonstatic_data_members_of(^^S, std::meta::access_context::unchecked())[0]).bytes)};
   std::size_t padding{0};
 
-  [:util::expand(nonstatic_data_members_of(
-        ^^S, std::meta::access_context::unchecked())):] >> [&, i = 0]<auto e>() {
+  template for(constexpr auto e: std::define_static_array(nonstatic_data_members_of(^^S, std::meta::access_context::unchecked())))
+  {
     if (pointer == offset_of(e).bytes)
       pointer += size_of(e);
     else {
       padding += offset_of(e).bytes - pointer;
       pointer = offset_of(e).bytes + size_of(e);
     }
-  };
+  }
   return padding;
 }
 

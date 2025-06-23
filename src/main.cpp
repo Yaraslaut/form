@@ -58,6 +58,6 @@ void runTests() { form::run_tests<^^for_tests>(); }
 } // namespace run
 
 int main() {
-  form::run_seq<^^run>();
+  form::run_tests<^^run>();
   return 0;
 }

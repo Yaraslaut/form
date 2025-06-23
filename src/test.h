@@ -149,6 +149,7 @@ template <typename T> void deserialize(T const &val) {
 
 template <typename T> bool round_trip(T const &val) {
   const auto data = form::format_yaml(val);
+  std::println(" from round trip: {}", data);
   const auto deserialized = form::from_yaml<T>(data);
   return form::compare(val, deserialized);
 }
@@ -382,7 +383,7 @@ bool EnumToString() { return form::enum_to_string(Color::red) == "red"; }
 
 bool EnumToStringWithTransform() {
   bool res = true;
-  auto transform = [](std::string data) {
+  auto transform = [](auto data) {
     std::string out;
     out += std::tolower(data[0]);
     for (auto const c : data.substr(1, data.size())) {

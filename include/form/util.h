@@ -70,7 +70,7 @@ template <auto... vals> replicator_type<vals...> replicator = {};
 template <typename R> consteval auto expand(R range) {
   std::vector<std::meta::info> args;
   for (auto r : range) {
-    args.push_back(reflect_value(r));
+    args.push_back(reflect_constant(r));
   }
   return substitute(^^__impl::replicator, args);
 }
